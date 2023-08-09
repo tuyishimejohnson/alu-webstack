@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# second line always a comment.
+
+domain=$1
+subdomain=${2:-"all"}
+
+function audit_subdomain {
+    sub=$1
+    query_result=$(dig $sub.$domain +short)
+    if [[ -n $query_result ]]; then
+        destination=$(echo $query_result | awk '{print toupper($1)}')
+        echo "The subdomain $sub is a A record and points to $destination"
+    fi
+}
+
+if [[ $subdomain == "all" ]]; then
+    audit_subdomain "www"
+    audit_subdomain "lb-01"
+    audit_subdomain "web-01"
+    audit_subdomain "web-02"
+else
+    audit_subdomain $subdomain
+fi
